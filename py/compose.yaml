@@ -10,9 +10,16 @@ volumes:
     name: ${VOLUME_POSTGRES_DATA:-postgres_data}
 
 services:
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - './mounts/ollama:/root/.ollama'
+    ports:
+      - '11434:11434'
   postgres:
+    container_name: postgres
     image: pgvector/pgvector:pg16
-    profiles: [postgres]
+#    profiles: [postgres]
     environment:
       - POSTGRES_USER=${R2R_POSTGRES_USER:-${POSTGRES_USER:-postgres}} # Eventually get rid of POSTGRES_USER, but for now keep it for backwards compatibility
       - POSTGRES_PASSWORD=${R2R_POSTGRES_PASSWORD:-${POSTGRES_PASSWORD:-postgres}} # Eventually get rid of POSTGRES_PASSWORD, but for now keep it for backwards compatibility
@@ -97,7 +104,7 @@ services:
       - ANYSCALE_API_KEY=${ANYSCALE_API_KEY:-}
 
       # Ollama
-      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-http://host.docker.internal:11434}
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-http://ollama:11434}
 
     networks:
       - r2r-network
@@ -109,6 +116,7 @@ services:
     restart: on-failure
     volumes:
       - ${R2R_CONFIG_PATH:-/}:${R2R_CONFIG_PATH:-/app/config}
+      - ./ollama_r2r.toml:/app/r2r.toml
     extra_hosts:
       - host.docker.internal:host-gateway
 

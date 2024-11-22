@@ -34,3 +34,5 @@ go.work
 go.work.sum
 
 .vscode/
+.idea
+mounts/
